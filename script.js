@@ -10,14 +10,20 @@ let tickets = JSON.parse(localStorage.getItem('actTickets')) || [
         subject: 'Portal Password Locked',
         category: 'Technical Support',
         date: '2026-10-01',
-        status: 'Resolved'
+        status: 'Resolved',
+        studentId: '2026-0001',
+        studentName: 'Sample Student',
+        details: 'My student portal password is locked.'
     },
     {
         id: '#ACT-1002',
         subject: 'Wi-Fi Authentication Error',
         category: 'Technical Support',
         date: '2026-10-01',
-        status: 'Pending'
+        status: 'Pending',
+        studentId: '2026-0002',
+        studentName: 'Sample Student',
+        details: 'I cannot connect to the ACT-STUDENT Wi-Fi.'
     }
 ];
 
@@ -97,10 +103,11 @@ function renderTickets() {
 
     tickets.forEach((t, index) => {
 
-        const statusClass =
-            t.status === 'Resolved'
-                ? 'status-resolved'
-                : 'status-pending';
+        let statusClass = 'status-pending';
+
+        if (t.status === 'Resolved') {
+            statusClass = 'status-resolved';
+        }
 
         tbody.innerHTML += `
             <tr>
@@ -121,13 +128,40 @@ function renderTickets() {
                 <td>
                     <button
                         class="action-btn"
-                        onclick="toggleStatus(${index})">
-                        Toggle Status
+                        onclick="viewTicket(${index})">
+                        View Details
                     </button>
                 </td>
             </tr>
         `;
     });
+}
+
+
+// ==========================================
+// VIEW TICKET DETAILS
+// ==========================================
+
+function viewTicket(index) {
+
+    const ticket = tickets[index];
+
+    if (!ticket) {
+        alert('Ticket could not be found.');
+        return;
+    }
+
+    alert(
+        `TICKET DETAILS\n\n` +
+        `Ticket ID: ${ticket.id}\n` +
+        `Student ID: ${ticket.studentId || 'Not provided'}\n` +
+        `Student Name: ${ticket.studentName || 'Not provided'}\n` +
+        `Category: ${ticket.category}\n` +
+        `Subject: ${ticket.subject}\n` +
+        `Date Submitted: ${ticket.date}\n` +
+        `Status: ${ticket.status}\n\n` +
+        `Description:\n${ticket.details || 'No description provided.'}`
+    );
 }
 
 
@@ -140,23 +174,25 @@ function handleTicketSubmit(event) {
     event.preventDefault();
 
     const studentId =
-        document.getElementById('studentId').value;
+        document.getElementById('studentId').value.trim();
 
     const studentName =
-        document.getElementById('studentName').value;
+        document.getElementById('studentName').value.trim();
 
     const category =
         document.getElementById('ticketCategory').value;
 
     const subject =
-        document.getElementById('ticketSubject').value;
+        document.getElementById('ticketSubject').value.trim();
 
     const details =
-        document.getElementById('ticketDetails').value;
+        document.getElementById('ticketDetails').value.trim();
 
+    // Generate ticket ID
     const newId =
         `#ACT-${Math.floor(1000 + Math.random() * 9000)}`;
 
+    // Get today's date
     const currentDate =
         new Date().toISOString().split('T')[0];
 
@@ -183,11 +219,11 @@ function handleTicketSubmit(event) {
     });
 
 
-    // SAVE TICKET
+    // Save ticket to localStorage
     saveTickets();
 
 
-    // Update table
+    // Update ticket table
     renderTickets();
 
 
@@ -203,32 +239,6 @@ function handleTicketSubmit(event) {
 
     // Go to My Tickets
     switchTabByNav('tickets-view');
-}
-
-
-// ==========================================
-// TOGGLE TICKET STATUS
-// ==========================================
-
-function toggleStatus(index) {
-
-    if (tickets[index].status === 'Pending') {
-
-        tickets[index].status = 'Resolved';
-
-    } else {
-
-        tickets[index].status = 'Pending';
-
-    }
-
-
-    // SAVE UPDATED STATUS
-    saveTickets();
-
-
-    // Update table
-    renderTickets();
 }
 
 
