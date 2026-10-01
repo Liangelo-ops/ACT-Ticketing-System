@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACT Bulacao - SHS Student Help Desk & Ticketing System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body {
+            background-color: #0a2540;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation Header */
+        header {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 12px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+        .logo-badge {
+            background: #0284c7;
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 1.4rem;
+            padding: 4px 10px;
+            border-radius: 8px;
+            letter-spacing: -1px;
+        }
+        .logo-title strong { color: #0a2540; font-size: 0.95rem; display: block; line-height: 1.2; }
+        .logo-title small { color: #0284c7; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px; }
+
+        nav { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+        nav button {
+            background: transparent;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        nav button:hover, nav button.active {
+            background-color: #0284c7;
+            color: #ffffff;
+        }
+        nav button.btn-login {
+            border: 1.5px solid #0284c7;
+            color: #0284c7;
+            margin-left: 8px;
+        }
+        nav button.btn-login:hover {
+            background-color: #0284c7;
+            color: #ffffff;
+        }
+
+        /* Container Views */
+        main { flex: 1; padding: 30px 5%; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Banner */
+        .hero {
+            padding: 20px 0 40px;
+            max-width: 750px;
+        }
+        .hero h1 {
+            font-size: 2.6rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+        .hero p {
+            font-size: 1.1rem;
+            color: #93c5fd;
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+        .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary { background-color: #0284c7; color: #ffffff; }
+        .btn-primary:hover { background-color: #0369a1; }
+        .btn-outline { background: transparent; color: #ffffff; border: 1.5px solid #ffffff; }
+        .btn-outline:hover { background: rgba(255, 255, 255, 0.12); }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+            margin-top: 10px;
+        }
+        .card {
+            background: #ffffff;
+            color: #0f172a;
+            border-radius: 16px;
+            padding: 26px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 14px 28px rgba(0,0,0,0.3);
+        }
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: #e0f2fe;
+            color: #0284c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .card-body h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; color: #0a2540; }
+        .card-body p { font-size: 0.9rem; color: #64748b; line-height: 1.4; margin-bottom: 12px; }
+        .card-arrow { font-size: 1.2rem; font-weight: 700; color: #0284c7; }
+
+        /* Content Section Styling (Forms, Tables, Guides) */
+        .panel {
+            background: #ffffff;
+            color: #0f172a;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .panel-header {
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        .panel-header h2 { color: #0a2540; font-size: 1.5rem; font-weight: 800; }
+        .panel-header p { color: #64748b; font-size: 0.9rem; margin-top: 4px; }
+
+        /* Form Controls */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group.full { grid-column: span 2; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 700; color: #334155; margin-bottom: 6px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #0284c7; }
+
+        /* Tables */
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
+        th, td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f8fafc; color: #475569; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .badge-pending { background: #fef3c7; color: #b45309; }
+        .badge-progress { background: #e0f2fe; color: #0369a1; }
+        .badge-resolved { background: #dcfce7; color: #15803d; }
+
+        /* Knowledge Base Articles */
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .kb-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: #f8fafc;
+        }
+        .kb-item h4 { color: #0284c7; margin-bottom: 6px; font-size: 1.05rem; }
+        .kb-item p { color: #475569; font-size: 0.9rem; line-height: 1.5; }
+
+        /* Login Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 37, 64, 0.85);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal {
+            background: #ffffff;
+            color: #0f172a;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 { color: #0a2540; font-size: 1.3rem; font-weight: 800; }
+        .close-btn { background: none; border: none; font-size: 1.6rem; color: #64748b; cursor: pointer; }
+
+        /* Footer */
+        footer {
+            margin-top: auto;
+            background: #06182b;
+            padding: 28px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 0.88rem;
+            color: #94a3b8;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        footer strong { color: #ffffff; }
+
+        @media (max-width: 640px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: span 1; }
+            .hero h1 { font-size: 2rem; }
+            header { flex-direction: column; gap: 12px; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="logo-box" onclick="showView('home')">
+            <span class="logo-badge">ACT</span>
+            <div class="logo-title">
+                <strong>ASIAN COLLEGE OF TECHNOLOGY</strong>
+                <small>BULACAO CAMPUS — SHS HELP DESK</small>
+            </div>
+        </div>
+        <nav>
+            <button class="nav-btn active" id="btn-home" onclick="showView('home')">🏠 Home</button>
+            <button class="nav-btn" id="btn-submit" onclick="showView('submit')">Submit Ticket</button>
+            <button class="nav-btn" id="btn-tickets" onclick="showView('tickets')">My Tickets</button>
+            <button class="nav-btn" id="btn-kb" onclick="showView('kb')">Knowledge Base</button>
+            <button class="nav-btn" id="btn-about" onclick="showView('about')">About Us</button>
+            <button class="nav-btn btn-login" onclick="toggleLoginModal(true)">👤 Login</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- HOME VIEW -->
+        <section id="view-home" class="view-section active">
+            <div class="hero">
+                <h1>ICT Student Help Desk & Ticketing System</h1>
+                <p>Report your ICT concerns easily and get the support you need. Dedicated to supporting Asian College of Technology Senior High School students.</p>
+                <div class="hero-btns">
+                    <button class="btn btn-primary" onclick="showView('submit')">📝 Submit a Ticket</button>
+                    <button class="btn btn-outline" onclick="showView('tickets')">📋 View My Tickets</button>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card" onclick="showView('submit')">
+                    <div class="card-icon">📝</div>
+                    <div class="card-body">
+                        <h3>Submit a Ticket</h3>
+                        <p>Report an issue or request technical, registrar, or guidance support.</p>
+                        <span class="card-arrow">&gt;</span>
+                    </div>
+                </div>
+                <div class="card" onclick="showView('tickets')">
+                    <div class="card-icon">🎟️</div>
+                    <div class="card-body">
+                        <h3>My Tickets</h3>
+                        <p>Track real-time status and progress of your submitted support requests.</p>
+                        <span class="card-arrow">&gt;</span>
+                    </div>
+                </div>
+                <div class="card" onclick="showView('kb')">
+                    <div class="card-icon">📚</div>
+                    <div class="card-body">
+                        <h3>Knowledge Base</h3>
+                        <p>Find quick answers, setup guides, and solutions for common technical issues.</p>
+                        <span class="card-arrow">&gt;</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SUBMIT TICKET FORM VIEW -->
+        <section id="view-submit" class="view-section">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>📝 Submit Support Ticket</h2>
+                    <p>Fill out the required information below to send your concern directly to support staff.</p>
+                </div>
+                <form onsubmit="handleTicketSubmit(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Student Full Name</label>
+                            <input type="text" id="inputName" placeholder="e.g. Juan Cruz" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Strand & Section</label>
+                            <input type="text" id="inputStrand" placeholder="e.g. TVL-ICT - PEARL" required>
+                        </div>
+                        <div class="form-group full">
+                            <label>Category</label>
+                            <select id="inputCategory" required>
+                                <option value="Technical Support">Technical Support (Wi-Fi, Lab PC, Portal)</option>
+                                <option value="Registrar Inquiries">Registrar Inquiries (Grades, Documents)</option>
+                                <option value="General Guidance">General Guidance (Consultation, Appointment)</option>
+                            </select>
+                        </div>
+                        <div class="form-group full">
+                            <label>Details / Problem Description</label>
+                            <textarea id="inputDetails" rows="4" placeholder="Briefly describe what assistance you need..." required></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+                        Submit Request Now
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- MY TICKETS LIST VIEW -->
+        <section id="view-tickets" class="view-section">
+            <div class="panel" style="max-width: 950px;">
+                <div class="panel-header">
+                    <h2>🎟️ Track My Tickets</h2>
+                    <p>Real-time status tracking for your submitted concerns.</p>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ticket ID</th>
+                                <th>Student Name</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ticketsTableBody">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- KNOWLEDGE BASE VIEW -->
+        <section id="view-kb" class="view-section">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>📚 Knowledge Base & Troubleshooting</h2>
+                    <p>Search solutions to common campus hardware and software concerns.</p>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="kbSearch" placeholder="🔍 Search guides (e.g., Wi-Fi, Portal, Lab)..." onkeyup="filterKB()" style="width:100%; padding:12px; border:1.5px solid #cbd5e1; border-radius:8px;">
+                </div>
+                <div id="kbList">
+                    <div class="kb-item">
+                        <h4>📶 Connecting to ACT Student Wi-Fi</h4>
+                        <p>Select the <strong>ACT_Student_WiFi</strong> network and log in using your student ID and default portal password.</p>
+                    </div>
+                    <div class="kb-item">
+                        <h4>🔑 Resetting Portal Password</h4>
+                        <p>If you cannot log into the student portal, visit the ICT office or submit a ticket under "Registrar Inquiries".</p>
+                    </div>
+                    <div class="kb-item">
+                        <h4>💻 Office 365 Account Activation</h4>
+                        <p>All officially enrolled Senior High School students are entitled to a free Microsoft 365 license using their school email.</p>
+                    </div>
+                    <div class="kb-item">
+                        <h4>🖥️ Computer Lab Log-in Issues</h4>
+                        <p>Ensure you are logging into the local workstation using your assigned class seat number and TVL-ICT credentials.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT US VIEW -->
+        <section id="view-about" class="view-section">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>ℹ️ About the Project</h2>
+                    <p>Research & System Rationale</p>
+                </div>
+                <p style="color:#475569; line-height:1.6; margin-bottom:15px;">
+                    This web-based student help desk system is specifically developed for Senior High School students at <strong>Asian College of Technology – Bulacao Campus</strong>.
+                </p>
+                <p style="color:#475569; line-height:1.6;">
+                    The system centralizes inquiry tracking, systematically monitors resolution progress, and provides an accessible channel between students and support personnel.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- LOGIN MODAL -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Student Login</h3>
+                <button class="close-btn" onclick="toggleLoginModal(false)">&times;</button>
+            </div>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Student ID Number</label>
+                    <input type="text" placeholder="e.g. 2024-00123" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:10px;">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div>
+            <strong>ASIAN COLLEGE OF TECHNOLOGY</strong><br>
+            BULACAO CAMPUS<br>
+            <small>Empowering Technology. Building the Future.</small>
+        </div>
+        <div>
+            ✉️ ictsupport@actbulacao.edu.ph<br>
+            📍 Bulacao, Talisay City, Cebu
+        </div>
+        <div>
+            🕒 <strong>Support Hours</strong><br>
+            Monday – Friday<br>
+            7:30 AM – 5:00 PM
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE JAVASCRIPT -->
+    <script>
+        // Mock State Management
+        let tickets = [
+            { id: '#ACT-1001', name: 'Brent Bundoc', category: 'Technical Support', status: 'Pending' },
+            { id: '#ACT-1000', name: 'Mayrianne Dungog', category: 'Registrar Inquiries', status: 'Resolved' }
+        ];
+
+        // View Switching Logic
+        function showView(viewName) {
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+
+            const targetSection = document.getElementById('view-' + viewName);
+            if (targetSection) targetSection.classList.add('active');
+
+            const targetBtn = document.getElementById('btn-' + viewName);
+            if (targetBtn) targetBtn.classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Render Tickets Table
+        function renderTickets() {
+            const tbody = document.getElementById('ticketsTableBody');
+            tbody.innerHTML = '';
+
+            tickets.forEach((t, index) => {
+                let badgeClass = 'badge-pending';
+                if (t.status === 'In Progress') badgeClass = 'badge-progress';
+                if (t.status === 'Resolved') badgeClass = 'badge-resolved';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${t.id}</strong></td>
+                        <td>${t.name}</td>
+                        <td>${t.category}</td>
+                        <td><span class="badge ${badgeClass}">${t.status}</span></td>
+                        <td>
+                            <button onclick="toggleTicketStatus(${index})" style="padding:4px 8px; font-size:0.75rem; border:1px solid #cbd5e1; background:#f8fafc; border-radius:6px; cursor:pointer;">
+                                Toggle Status
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Handle Form Submission
+        function handleTicketSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('inputName').value;
+            const category = document.getElementById('inputCategory').value;
+            const newId = '#ACT-' + Math.floor(1002 + Math.random() * 9000);
+
+            tickets.unshift({
+                id: newId,
+                name: name,
+                category: category,
+                status: 'Pending'
+            });
+
+            renderTickets();
+            alert(`Ticket Submitted Successfully!\nYour Reference Number is: ${newId}`);
+            
+            // Reset form and redirect to tickets table
+            e.target.reset();
+            showView('tickets');
+        }
+
+        // Toggle Ticket Status for Prototype Demo
+        function toggleTicketStatus(index) {
+            const statuses = ['Pending', 'In Progress', 'Resolved'];
+            let current = statuses.indexOf(tickets[index].status);
+            tickets[index].status = statuses[(current + 1) % statuses.length];
+            renderTickets();
+        }
+
+        // Knowledge Base Filter
+        function filterKB() {
+            const query = document.getElementById('kbSearch').value.toLowerCase();
+            const items = document.querySelectorAll('.kb-item');
+            
+            items.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                item.style.display = text.includes(query) ? 'block' : 'none';
+            });
+        }
+
+        // Login Modal Logic
+        function toggleLoginModal(show) {
+            document.getElementById('loginModal').style.display = show ? 'flex' : 'none';
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            alert('Login Successful!');
+            toggleLoginModal(false);
+        }
+
+        // Initialize App
+        window.onload = function() {
+            renderTickets();
+        };
+    </script>
+</body>
+</html>
+```
