@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACT Bulacao Campus - Student Help Desk</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Header Navigation Bar -->
+    <header>
+        <div class="logo-container">
+    <img src="act-logo.png" alt="Asian College of Technology Logo" class="act-logo">
+
+
+    <div class="logo-text">
+        Asian College of Technology<br>
+        <small>Bulacao Campus</small>
+    </div>
+</div>
+
+        <nav>
+            <button class="nav-btn active" onclick="switchView('home-view', this)">Home</button>
+            <button class="nav-btn" onclick="switchView('submit-view', this)">Submit Ticket</button>
+            <button class="nav-btn" onclick="switchView('tickets-view', this)">My Tickets</button>
+            <button class="nav-btn" onclick="switchView('kb-view', this)">Knowledge Base</button>
+            <button class="nav-btn" onclick="switchView('about-view', this)">About Us</button>
+            <button class="nav-btn login-nav-btn" onclick="openLoginModal()">Login</button>
+        </nav>
+    </header>
+
+    <div class="main-container">
+
+        <!-- 1. HOME VIEW -->
+        <section id="home-view" class="view-section active">
+            <div class="hero">
+                <h1> Student Help Desk & Ticketing System</h1>
+                <p>Report your concerns easily and get the support you need. We are here to help you learn better.</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary" onclick="switchTabByNav('submit-view')">Submit a Ticket</button>
+                    <button class="btn-outline" onclick="switchTabByNav('tickets-view')">View My Tickets</button>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card" onclick="switchTabByNav('submit-view')">
+                    <div>
+                        <div class="card-icon">📝</div>
+                        <h3>Submit a Ticket</h3>
+                        <p>Report an issue or request technical assistance from ICT support.</p>
+                    </div>
+                    <span class="card-arrow">→</span>
+                </div>
+
+                <div class="card" onclick="switchTabByNav('tickets-view')">
+                    <div>
+                        <div class="card-icon">📋</div>
+                        <h3>My Tickets</h3>
+                        <p>Track the status and resolution progress of your submitted concerns.</p>
+                    </div>
+                    <span class="card-arrow">→</span>
+                </div>
+
+                <div class="card" onclick="switchTabByNav('kb-view')">
+                    <div>
+                        <div class="card-icon">📚</div>
+                        <h3>Knowledge Base</h3>
+                        <p>Find step-by-step guides and self-help solutions to common technical issues.</p>
+                    </div>
+                    <span class="card-arrow">→</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. SUBMIT TICKET VIEW -->
+        <section id="submit-view" class="view-section">
+            <div class="panel form-panel">
+                <h2 class="panel-title">Submit a Support Ticket</h2>
+                <form id="ticketForm" onsubmit="handleTicketSubmit(event)">
+                    <div class="form-group">
+                        <label>Student ID Number</label>
+                        <input type="text" class="form-control" id="studentId" placeholder="e.g., 2026-0123" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" class="form-control" id="studentName" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Issue Category</label>
+                        <select class="form-control" id="ticketCategory" required>
+                            <option value="">Select Category...</option>
+                            <option value="Technical Support">Technical Support (Wi-Fi, Computer Lab)</option>
+                            <option value="Registrar Inquiries">Registrar & Student Records</option>
+                            <option value="General Guidance">General Guidance / Student Affairs</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Subject / Short Summary</label>
+                        <input type="text" class="form-control" id="ticketSubject" placeholder="Briefly describe the issue" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Detailed Description</label>
+                        <textarea class="form-control" id="ticketDetails" placeholder="Provide complete details about your concern..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary btn-block">Submit Ticket Request</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 3. MY TICKETS VIEW -->
+        <section id="tickets-view" class="view-section">
+            <div class="panel">
+                <h2 class="panel-title">My Support Tickets</h2>
+                <div class="search-box">
+                    <input type="text" id="ticketSearch" class="form-control" placeholder="Search ticket ID, subject, or status..." onkeyup="filterTickets()">
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ticket ID</th>
+                                <th>Subject</th>
+                                <th>Category</th>
+                                <th>Date Submitted</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ticketTableBody">
+                            <!-- Dynamic Content Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. KNOWLEDGE BASE VIEW -->
+        <section id="kb-view" class="view-section">
+            <div class="panel">
+                <h2 class="panel-title">Knowledge Base & Guides</h2>
+                <div class="search-box">
+                    <input type="text" id="kbSearch" class="form-control" placeholder="Search articles (e.g., Wi-Fi, Portal, Password)..." onkeyup="filterKB()">
+                </div>
+                <div id="kbList" class="cards-grid">
+                    <div class="card kb-item" onclick="alert('Guide: Connect to ACT-STUDENT Wi-Fi network using your Student ID and Portal Password.')">
+                        <div>
+                            <h3>📶 Connecting to Campus Wi-Fi</h3>
+                            <p>How to authenticate and connect your devices to the student wireless network.</p>
+                        </div>
+                    </div>
+                    <div class="card kb-item" onclick="alert('Guide: Go to the Portal Login page and click Password Reset to send a code to your registered email.')">
+                        <div>
+                            <h3>🔑 Student Portal Password Reset</h3>
+                            <p>Self-service instructions to recover or update your student account password.</p>
+                        </div>
+                    </div>
+                    <div class="card kb-item" onclick="alert('Guide: Log in using your @actbulacao.edu.ph email account on office.com to activate Microsoft 365.')">
+                        <div>
+                            <h3>📧 Activating Office 365 Account</h3>
+                            <p>Instructions for accessing your institutional school email and MS Office apps.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. ABOUT US VIEW -->
+        <section id="about-view" class="view-section">
+            <div class="panel about-panel">
+                <h2 class="panel-title">About ACT Bulacao Help Desk</h2>
+                <p class="about-text">
+                    The <strong>Asian College of Technology – Bulacao Campus Web-Based Student Help Desk</strong> is designed to centralize technical assistance, inquiry tracking, and student support services.
+                </p>
+                <p class="about-text">
+                    Our goal is to ensure prompt, transparent, and organized resolution of student inquiries to foster an optimal learning environment.
+                </p>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeLoginModal()">×</button>
+            <h3 class="modal-title">Student Portal Login</h3>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Student ID</label>
+                    <input type="text" class="form-control" placeholder="Enter ID Number" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" placeholder="Enter Password" required>
+                </div>
+                <button type="submit" class="btn-primary btn-block">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div>
+            <strong>ASIAN COLLEGE OF TECHNOLOGY</strong><br>
+            BULACAO CAMPUS<br>
+            <small>Empowering Technology. Building the Future.</small>
+        </div>
+        <div>
+            📧 ictsupport@actbulacao.edu.ph<br>
+            📍 Bulacao, Talisay City, Cebu
+        </div>
+        <div>
+            🕒 <strong>Support Hours</strong><br>
+            Monday – Friday: 7:30 AM – 5:00 PM
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
